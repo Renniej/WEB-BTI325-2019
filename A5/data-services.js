@@ -166,25 +166,23 @@ exports.getManagers = function(){
 
     return new Promise(function(resolve, reject){
 
+        sequelize.sync().then(function(){
 
-     if (employees.length != 0)
-        for (let i = 0; i < employees.length; i++){
-            if (employees[i].isManager == true)
-            Managers.push(employees[i])
-        }
-    else {
-        reject("Employees array is empty... sorry pal");
+            Employee.findAll({where : {isManager : true}, order : ['empNum']}).then(function(array_of_mangers){
 
-   
-    }
-    if (Managers.length != 0){
+                resolve(array_of_mangers);
 
-        resolve(Managers);
+            }).catch(function(err){
+                reject("No Managers exist or error: " + err)
+            })
 
-    }
-    else{
-        reject("No managers exist... ")
-    }
+
+        }).catch(function(err){
+
+            reject("Something went wrong with sync in getManagers function :" + err )
+
+        })
+        
 
 
 
@@ -198,13 +196,11 @@ exports.getDepartments = function(){
 
     return new Promise(function(resolve , reject){
 
-
-
-
         sequelize.sync().then(function(){
 
-            Department.findAll().catch(function(array_of_depts){
+            Department.findAll().then(function(array_of_depts){
 
+                    resolve(array_of_depts);
 
             }).catch(function(err){
                         reject("No results found or Error : " + err)
@@ -225,10 +221,74 @@ exports.addEmployee = function(data){
 
         console.log("add Employee Called");
 
-       var errText = "";
+       
 
-       let emp = {  //create emp object using data parameter
-            employeeNum : employees.length + 1,       
+
+        sequelize.sync().then(function(){
+
+            setAttributesToNull(data); //set emp_array attributes to null if they're empty
+
+
+            Employee.create({
+                //empNum: data.employeeNum,
+                firstName : data.firstName,
+                lastName : data.lastName,
+                email : data.email,
+                SSN : data.SSN,
+                addressStreet : data.addressStreet,
+                addressState: data.addressState,
+                addressPostal : data.addressPostal,
+                maritalStatus : data.maritalStatus ,
+                isManager : data.isManager === null ? false : true,
+                employeeManagerNum : data.employeeManagerNum === undefined ? null : data.employeeManagerNum,
+                status : data.status,
+                department : data.department,
+                hireDate : data.hireDate
+
+            }).then(function(newEmp){
+                    console.log(newEmp);
+                    resolve(newEmp);
+
+            }).catch(function(err){
+                reject("Something went wrong with adding a new employe : " + err )
+            })
+
+        }).catch(function(error){
+
+            reject("Something went wrong with sync in addEmployee function : " + err)
+        })
+
+
+
+    })
+   
+}
+
+
+ var setAttributesToNull = function(obj){
+    for(attribute in obj){
+
+        if ( (attribute === undefined )  || (attribute === "") ){
+            attribute = null
+        }  
+    }
+
+    
+ }
+
+exports.updateEmployee = function(data){
+   
+    
+
+    return new Promise(function(resolve, reject){
+
+
+     sequelize.sync().then(function(){
+
+        setAttributesToNull(data); //set emp_array attributes to null if they're empty
+
+        Employee.update({
+
             firstName : data.firstName,
             lastName : data.lastName,
             email : data.email,
@@ -236,44 +296,43 @@ exports.addEmployee = function(data){
             addressStreet : data.addressStreet,
             addressState: data.addressState,
             addressPostal : data.addressPostal,
-            maritalStatus : data.maritalStatus,
-            isManager : data.isManager === undefined ? false : true,
+            maritalStatus : data.maritalStatus ,
+            isManager : data.isManager === null ? false : true,
             employeeManagerNum : data.employeeManagerNum === undefined ? null : data.employeeManagerNum,
             status : data.status,
             department : data.department,
             hireDate : data.hireDate
-       };   
-   
-        
-            employees.push(emp);
-            console.log("RESOLVED addemployee")
-            resolve(emp);
-      
 
-    })
-   
-}
-
-exports.updateEmployee = function(employeeData){
-    console.log("UPDATE CALLED")
-    return new Promise(function(resolve, reject){
+        }).then(function(){
+            resolve();
+        }).catch(function(err){
+            reject("Update Employee Function Error : " + err);
+        })
 
 
-        for(let i = 0; i< employees.length; ++i){
-
-            if (employees[i].employeeNum == employeeData.employeeNum){
-                console.log("MATCH FOUND FOR UPDATE");
-                employees[i] = employeeData;
-                console.log("Update complete");
-                resolve();
-            }
-
-        }
-
-        reject("No emp of " + employeeData.employeeNum + "Found");
+     }).catch(function(err){
+         reject("Sync error in updateEmployee Function : " + err);
+     })
             
 
         
 
     })
+}
+exports.addDepartment = function(departmentData){
+
+    sequelize.sync().then(function(){
+
+        Department.create({
+
+
+            
+        })
+
+
+    }).catch(function(err){
+        reject("ERROR : " +  err)
+    })
+
+
 }

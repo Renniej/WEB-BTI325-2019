@@ -106,7 +106,12 @@ app.get("/employees", function(req,res){
     data_services.getAllEmployees().then(function(data){
 
         //res.json(data);
-        res.render("employees", {data : data});
+        if (data.length > 0){
+          res.render("employees", {data : data});
+        }
+        else{
+          res.render("employees", {data : "No results"});
+        }
     })
     .catch(function(err){
        res.render("employees" , {data: err});
@@ -164,7 +169,14 @@ app.get("/managers", function(req, res){
 app.get("/departments", function(req, res){
 
     data_services.getDepartments().then(function(data){
-      res.render("departments" , {data: data});
+
+      if (data.length > 0){
+        res.render("departments", {data : data});
+      }
+      else{
+        res.render("departments", {data : "No results"});
+      }
+      
   })
   .catch(function(err){
       res.render("departments" , {data: err});
@@ -205,8 +217,8 @@ app.get("/images",  function(req, res){
 
 app.post("/employee/update", function(req,res){
    
-    data_services.updateEmployee(req.body).then(function(data){
-      console.log(req.body);
+    data_services.updateEmployee(req.body).then(function(){
+      //console.log(req.body);
         res.redirect("/employees");
 
     }).catch(function(err){
