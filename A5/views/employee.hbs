@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-md-12">
         {{#each viewData.employee}}
-        <h2>{{firstName}} {{lastName}} - Employee: {{employeeNum}}</h2>
+        <h2>{{firstName}} {{lastName}} - Employee: {{empNum}}</h2>
         <hr />
         <form method="post" action="/employee/update">
-        <input name="employeeNum" value="{{employeeNum}}" type="hidden" /> 
+        <input name="employeeNum" value="{{empNum}}" type="hidden" /> 
             <fieldset>
                 <legend>Personal Information</legend>
                 <div class="row">

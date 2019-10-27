@@ -209,10 +209,16 @@ app.get('/employee/delete/:employeeNum', function(req, res){
 app.get("/managers", function(req, res){
 
     data_services.getManagers().then(function(data){
-      res.json(data);
+      //res.json(data);
+      if (data.length > 0){
+        res.render("managers", {data : data});
+      }
+      else{
+        res.render("managers", {data : "No results"});
+      }
   })
   .catch(function(err){
-    res.json({"message" : err});
+     res.render("managers" , {data: err});
   })
 
 

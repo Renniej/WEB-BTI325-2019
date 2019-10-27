@@ -216,6 +216,20 @@ exports.getDepartments = function(){
 
 }
 
+var CheckIfAttributesExist = function(emp){
+
+
+console.log(emp);
+
+    for (attribute in emp){
+        if (attribute === ""){
+            attribute = null;
+        }
+    }
+}
+
+
+
 exports.addEmployee = function(data){
 
     return new Promise(function(resolve, reject){
@@ -227,23 +241,24 @@ exports.addEmployee = function(data){
 
         sequelize.sync().then(function(){
 
-            setAttributesToNull(data); //set emp_array attributes to null if they're empty
+            CheckIfAttributesExist(data); //set emp_array attributes to null if they're empty
 
             Employee.create({
                 //empNum: data.employeeNum,
-                firstName : data.firstName,
-                lastName : data.lastName,
-                email : data.email,
-                SSN : data.SSN,
-                addressStreet : data.addressStreet,
-                addressState: data.addressState,
-                addressPostal : data.addressPostal,
-                maritalStatus : data.maritalStatus ,
-                isManager : data.isManager === null ? false : true,
-                employeeManagerNum : data.employeeManagerNum,
-                status : data.status,
-                department : data.department,
-                hireDate : data.hireDate
+                firstName : data.firstName ? data.firstName  : null,
+                lastName : data.lastName ? data.lastName : null,
+                email : data.email ? data.email : null,
+                SSN : data.SSN ? data.SSN : null,
+                addressStreet : data.addressStreet ? data.addressStreet : null,
+                addressCity : data.addressCity ? data.addressCity : null,
+                addressState: data.addressState ? data.addressState : null,
+                addressPostal : data.addressPostal ? data.addressPostal : null,
+                maritalStatus : data.maritalStatus  ? data.maritalStatus : null,
+                isManager : data.isManager ? false : true,
+                employeeManagerNum : data.employeeManagerNum ? data.employeeManagerNum : null,
+                status : data.status ? data.status : null,
+                department : data.department ? data.department : null,
+                hireDate : data.hireDate ? data.hireDate : null    
 
             }).then(function(newEmp){
                     console.log(newEmp);
@@ -265,28 +280,6 @@ exports.addEmployee = function(data){
 }
 
 
- var setAttributesToNull = function(obj){
-
-
-    console.log(obj);
-    for(attribute in obj){
-
-        console.log(attribute);
-        if ( (attribute === undefined )  || (attribute == '') || !(attribute)){
-            attribute = null
-        }  
-    }
-
-    
-
-    if (!obj.employeeManagerNum){ //Idk why I need this....
-        //console.log("EMPLOYEEMANAGER UNDEFINED ------------------------------")
-        obj.employeeManagerNum = null;
-    }
-
-    
- }
-
 exports.updateEmployee = function(data){
    
     
@@ -296,23 +289,24 @@ exports.updateEmployee = function(data){
 
      sequelize.sync().then(function(){
 
-        setAttributesToNull(data); //set emp_array attributes to null if they're empty
+      CheckIfAttributesExist(data); //set emp_array attributes to null if they're empty
 
         Employee.update({
 
-            firstName : data.firstName,
-            lastName : data.lastName,
-            email : data.email,
-            SSN : data.SSN,
-            addressStreet : data.addressStreet,
-            addressState: data.addressState,
-            addressPostal : data.addressPostal,
-            maritalStatus : data.maritalStatus ,
-            isManager : data.isManager === null ? false : true,
-            employeeManagerNum : data.employeeManagerNum === undefined ? null : data.employeeManagerNum,
-            status : data.status,
-            department : data.department,
-            hireDate : data.hireDate
+            firstName : data.firstName ? data.firstName : null,
+            lastName : data.lastName ? data.lastName : null,
+            email : data.email ? data.email : null,
+            SSN : data.SSN ? data.SSN : null,
+            addressStreet : data.addressStreet ? data.addressStreet : null,
+            addressState: data.addressState ? data.addressState : null,
+            addressPostal : data.addressPostal ? data.addressPostal : null,
+            addressCity : data.addressCity ? data.addressCity : null,
+            maritalStatus : data.maritalStatus  ? data.maritalStatus : null,
+            isManager : data.isManager ? false : true,
+            employeeManagerNum : data.employeeManagerNum ? data.employeeManagerNum : null,
+            status : data.status ? data.status : null,
+            department : data.department ? data.department : null,
+            hireDate : data.hireDate ? data.hireDate : null
 
         }, {where : {empNum : data.employeeNum}}).then(function(){
             resolve();
@@ -363,7 +357,7 @@ exports.addDepartment = function(data){
         
         sequelize.sync().then(function(){
 
-            setAttributesToNull(data);
+            CheckIfAttributesExist(data);
 
             Department.create({
 
@@ -395,7 +389,6 @@ exports.updateDepartment = function(data){
 
         sequelize.sync().then(function(){
 
-            setAttributesToNull(data);
             console.log(data);
             Department.update({
     
