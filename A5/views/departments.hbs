@@ -16,7 +16,7 @@
                             {{#each data}}
                                 <tr>
                                     <td> <a href="/employees?department={{this.departmentId}}">  {{this.departmentId}} </a> </td>
-                                    <td> <a href ="/employees?department={{this.departmentId}}"> {{this.departmentName}}</a> </td>
+                                    <td><a href="/department/{{departmentId}}">{{departmentName}}</a></td>
                                 </tr>
                             {{/each}}
                     </tbody>

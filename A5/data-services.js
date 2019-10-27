@@ -9,8 +9,8 @@ var exports = module.exports = {};
 
 const Sequelize = require('sequelize');
 
-var sequelize = new Sequelize('d39epug45opnpq', 'kvwmgnuvgkjgzn', 'a4327f1fb9be222175af34d2e8e8c26a3fa21470b899c98aa6b032147b814ede', {
-    host: 'ec2-54-204-37-92.compute-1.amazonaws.com',
+var sequelize = new Sequelize('dau2md2t2cqd1k', 'ioqpywblpyuzac', '6cf200773d20b91692e0ee471793d64b6f7c1de26e85fcca844db73bd6c99812', {
+    host: 'ec2-54-235-163-246.compute-1.amazonaws.com',
     dialect: 'postgres',
     port: 5432,
     dialectOptions: {ssl: true}});
@@ -198,8 +198,9 @@ exports.getDepartments = function(){
 
         sequelize.sync().then(function(){
 
-            Department.findAll().then(function(array_of_depts){
+            Department.findAll({order : ['departmentId']}).then(function(array_of_depts){
 
+                   //console.log(array_of_depts);
                     resolve(array_of_depts);
 
             }).catch(function(err){
@@ -228,7 +229,6 @@ exports.addEmployee = function(data){
 
             setAttributesToNull(data); //set emp_array attributes to null if they're empty
 
-
             Employee.create({
                 //empNum: data.employeeNum,
                 firstName : data.firstName,
@@ -240,7 +240,7 @@ exports.addEmployee = function(data){
                 addressPostal : data.addressPostal,
                 maritalStatus : data.maritalStatus ,
                 isManager : data.isManager === null ? false : true,
-                employeeManagerNum : data.employeeManagerNum === undefined ? null : data.employeeManagerNum,
+                employeeManagerNum : data.employeeManagerNum,
                 status : data.status,
                 department : data.department,
                 hireDate : data.hireDate
@@ -266,11 +266,22 @@ exports.addEmployee = function(data){
 
 
  var setAttributesToNull = function(obj){
+
+
+    console.log(obj);
     for(attribute in obj){
 
-        if ( (attribute === undefined )  || (attribute === "") ){
+        console.log(attribute);
+        if ( (attribute === undefined )  || (attribute == '') || !(attribute)){
             attribute = null
         }  
+    }
+
+    
+
+    if (!obj.employeeManagerNum){ //Idk why I need this....
+        //console.log("EMPLOYEEMANAGER UNDEFINED ------------------------------")
+        obj.employeeManagerNum = null;
     }
 
     
@@ -303,7 +314,7 @@ exports.updateEmployee = function(data){
             department : data.department,
             hireDate : data.hireDate
 
-        }).then(function(){
+        }, {where : {empNum : data.employeeNum}}).then(function(){
             resolve();
         }).catch(function(err){
             reject("Update Employee Function Error : " + err);
@@ -319,20 +330,120 @@ exports.updateEmployee = function(data){
 
     })
 }
-exports.addDepartment = function(departmentData){
-
-    sequelize.sync().then(function(){
-
-        Department.create({
 
 
-            
+
+exports.deleteEmployeeByNum = function(data){
+
+        return new Promise(function(resolve, reject){
+
+            sequelize.sync().then(function(){
+
+                Employee.destroy({where : {empNum : data.employeeNum}}).then(function(){
+                    resolve();
+                }).catch(function(err){
+                    reject("Err with delete emp : " + err);
+                })
+
+
+            }).catch(function(err){
+
+                reject("Issue with Sync in  deleteEmpy : " + err)
+            })
+
+        })
+
+}
+
+
+exports.addDepartment = function(data){
+
+
+    return new Promise(function(resolve, reject){
+        
+        sequelize.sync().then(function(){
+
+            setAttributesToNull(data);
+
+            Department.create({
+
+                departmentName : data.departmentName
+
+            }).then(function(dept_obj){
+
+                resolve();
+
+            }).catch(function(err){
+
+
+                reject("Error with Dept Create : " + err);
+
+            })
+
+
+        }).catch(function(err){
+            reject("ERROR : " +  err)
+        })
+    })
+}
+
+
+exports.updateDepartment = function(data){
+    
+
+    return new Promise(function(resolve, reject){
+
+        sequelize.sync().then(function(){
+
+            setAttributesToNull(data);
+            console.log(data);
+            Department.update({
+    
+                departmentName : data.departmentName
+    
+            }, {where : {departmentId : data.departmentId}}).then(function(){
+                resolve()
+            }).catch(function(err){
+                reject("ERROR : " + err);
+            })
+    
+        }).catch(function(err){
+    
+            reject("Error in update Department Sync : " + err);
         })
 
 
-    }).catch(function(err){
-        reject("ERROR : " +  err)
     })
+    
+
+}
+
+
+exports.getDepartmentById = function(data){
+
+
+    return new Promise(function(resolve, reject){
+
+        sequelize.sync().then(function(){
+
+            Department.findAll({where : {departmentId : data.departmentId}}).then(function(dept_obj){
+
+                    resolve(dept_obj[0]);
+
+            }).catch(function(err){
+
+                reject("Error with findAll depts : " + err);
+
+            })
+
+        }).catch(function(err){
+
+            reject("ERROR with sync in getDeptById : " + err);
+        })
+
+    })
+
+
 
 
 }
