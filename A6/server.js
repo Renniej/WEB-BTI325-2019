@@ -119,11 +119,25 @@ app.get("/login", function(req,res){
 
 })
 
+app.get("logout", function(req, res){
+
+    res.session.reset();
+    res.redirect("/");
+
+});
+
+
 app.get("/register", function(req,res){
 
   res.render("register");
 
 })
+
+app.get("/userHistory", ensureLogin,function(req,res){
+
+    res.render("userHistory");
+
+});
 
 app.get("/employees", ensureLogin, function(req,res){
 
@@ -322,6 +336,7 @@ app.get("/images", ensureLogin, function(req, res){
 app.post("/register", function(req, res){
 
       dataServiceAuth.registerUser(req.body).then(function(){
+        
 
          res.render("register", {successMessage : "User Created"});
 
@@ -337,11 +352,23 @@ app.post("/login", function(req,res){
 
     req.body.userAgent = req.get('User-Agent');
 
-    dataServiceAuth.checkUser(req.body).then(function(){
+    dataServiceAuth.checkUser(req.body).then(function(user){
+
+      req.session.user = {
+
+        userName : user.userName,
+        email : user.email,
+        loginHistory : user.loginHistory
+
+
+      }
+
+      res.redirect("/employees");
 
     }).catch(function(err){
 
-
+      //Returning the userName back to the login page, so the user does not forget the user value that was used to attempt to log into the system
+      res.render("login", {errorMessage : err, userName : req.body.userName});
 
     })
 
