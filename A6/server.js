@@ -114,14 +114,15 @@ app.get("/about", (req, res) =>{
 
 
 app.get("/login", function(req,res){
-
+    console.log("LOGIN PAGE!");
     res.render("login");
 
 })
 
-app.get("logout", function(req, res){
+app.get("/logout", function(req, res){
 
-    res.session.reset();
+  
+    req.session.reset();
     res.redirect("/");
 
 });
@@ -335,6 +336,7 @@ app.get("/images", ensureLogin, function(req, res){
 
 app.post("/register", function(req, res){
 
+  console.log("REGISTERING USER!");
       dataServiceAuth.registerUser(req.body).then(function(){
         
 
